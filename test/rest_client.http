@@ -1,2 +1,6 @@
 
 GET http://localhost:8000/events/notify-close-events
+
+###
+
+GET http://localhost:8000/users/8/notifications
