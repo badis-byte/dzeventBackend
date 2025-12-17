@@ -1,7 +1,10 @@
 from datetime import datetime, timezone
 from core.supabase_client import supabase
 
-def notify_close_events():
+from celery import shared_task
+
+@shared_task
+def notify_close_events(self):
     # Fetch events
     result = supabase.table("events").select("*").execute()
     if not result.data:
@@ -10,6 +13,7 @@ def notify_close_events():
     events = result.data
 
     now = datetime.now()
+    close_count = 0
 
     for event in events:
         # Parse datetime (assuming ISO strings in DB)
@@ -21,6 +25,7 @@ def notify_close_events():
         if days_left != 1:
             continue
 
+        close_count += 1
         # Fetch interested users
         interests_res = (
             supabase
@@ -40,3 +45,5 @@ def notify_close_events():
             }
 
             supabase.table("notifications").insert(notif_payload).execute()
+
+    print(f"{close_count} Close events are notified")
