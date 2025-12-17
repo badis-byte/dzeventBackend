@@ -4,3 +4,7 @@ djangorestframework==3.16.1
 supabase==2.25.1
 postgres==4.0
 gunicorn==23.0.0
+django-cors-headers==4.4.0
+
+
+
