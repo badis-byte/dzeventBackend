@@ -91,3 +91,21 @@ class UserDeleteAll(APIView):
             return Response({"deleted": True}, status=status.HTTP_200_OK)
         except APIError as e:
             return Response(e.args, status=status.HTTP_400_BAD_REQUEST)
+
+class UserSetFcmtoken(APIView):
+    def post(self, request, id):
+        fcmtoken = request.data.get('fcm_token')
+        payload = {'user_id': id, 'fcm_token': fcmtoken}
+        try:
+            result = supabase.table("profiles").insert(payload).execute()
+            return Response(status=status.HTTP_201_CREATED)
+        except APIError as e:
+            return Response(e.args, status=status.HTTP_400_BAD_REQUEST)
+
+class UserNotifications(APIView):
+    def get(self, request, id):
+        try:
+            result = supabase.table("notifications").select().eq("user_id", id).execute()
+            return Response(result.data, status=status.HTTP_200_OK)
+        except APIError as e:
+            return Response(e.args, status=status.HTTP_400_BAD_REQUEST)

@@ -5,6 +5,7 @@ from core.supabase_client import supabase
 from postgrest.exceptions import APIError
 import json
 
+from .tasks import notify_close_events
 
 class EventListCreate(APIView):
     """Get all events or create a new event"""
@@ -115,3 +116,12 @@ class EventUserList(APIView):
             return Response(result.data or [], status=status.HTTP_200_OK)
         except APIError as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class NotifyCloseEvent(APIView):
+    def get(self, request):
+        try:
+            notify_close_events()
+            return Response(status=status.HTTP_200_OK)
+        except APIError as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
