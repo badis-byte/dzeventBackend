@@ -1,9 +1,11 @@
+##from supabase import create_client
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from core.supabase_client import supabase
 from postgrest.exceptions import APIError
 import json
+import mimetypes
 
 
 class EventListCreate(APIView):
@@ -17,15 +19,58 @@ class EventListCreate(APIView):
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
     def post(self, request):
-        try:
-            payload = json.loads(request.body.decode("utf-8"))
-            payload.pop("id", None)
-            result = supabase.table("events").insert(payload).execute()
-            return Response(result.data, status=status.HTTP_201_CREATED)
-        except (json.JSONDecodeError, UnicodeDecodeError):
-            return Response({"error": "Invalid JSON"}, status=status.HTTP_400_BAD_REQUEST)
-        except APIError as e:
-            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        data = {
+            "createdAt": request.data.get("createdAt"),
+            "title": request.data.get("title"),
+            "description": request.data.get("description"),
+            "location": request.data.get("location"),
+            "associationId": request.data.get("associationId"),
+            "category": request.data.get("category"),
+            "endDatetime": request.data.get("endDatetime"),
+            "startDatetime": request.data.get("startDatetime"),
+            "imageUrl": request.data.get("imageUrl"),
+        }
+        #data.pop("id", None)
+        data["associationId"] = int(data["associationId"])
+
+        image = request.FILES.get("image")
+
+        # Validate required fields
+        # required_fields = ["title", "date"]
+        # for field in required_fields:
+        #     if field not in data:
+        #         return Response(
+        #             {"error": f"{field} is required"},
+        #             status=status.HTTP_400_BAD_REQUEST,
+        #         )
+
+        # Upload image to Supabase (if provided)
+        if image:
+            path = data["imageUrl"]
+
+            content_type = image.content_type
+            if content_type == "application/octet-stream" or not content_type:
+                guessed, _ = mimetypes.guess_type(image.name)
+                content_type = guessed or "image/jpeg"
+
+            try:
+                # supabases = create_client(
+                #     "https://jkcqgchkidxxtrjhmmha.supabase.co",
+                #     "58c924d872df7380f4d00ba169a7c0d1ced53e5dc524d8a3c15af5ebc3deef82"
+                # )
+                supabase.storage.from_("pictures").upload(
+                    path="events/"+path,
+                    file=image.read(),
+                    file_options={"content-type": content_type},
+                )
+
+                data["imageUrl"] = supabase.storage.from_("pictures").get_public_url("events/"+path)
+                result = supabase.table("events").insert(dict(data)).execute()
+            except APIError as e:
+        # Insert clean data into Supabase
+                print("------2222222----------"+e)
+
+        return Response(result.data, status=status.HTTP_201_CREATED)
 
 
 class EventDetail(APIView):
