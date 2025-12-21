@@ -1,7 +1,8 @@
 from django.urls import path
 from .views import (
     UserList, UserCreate, UserDeleteAll,
-    UserLogin, UserDetail, UserUpdate
+    UserLogin, UserDetail, UserUpdate,
+    UserSetFcmtoken, UserNotifications
 )
 
 urlpatterns = [
@@ -11,4 +12,6 @@ urlpatterns = [
     path('login/', UserLogin.as_view()),
     path('<int:id>/', UserDetail.as_view()),
     path('<int:id>/update/', UserUpdate.as_view()),
+    path('<int:id>/set-fcmtoken', UserSetFcmtoken.as_view()),
+    path('<int:id>/notifications', UserNotifications.as_view()),
 ]

@@ -5,7 +5,8 @@ from .views import (
     EventUserList,
     EventFilteredList,
     EventSearch,
-    EventDeleteAll
+    EventDeleteAll,
+    NotifyCloseEvent
 )
 
 urlpatterns = [
@@ -15,4 +16,5 @@ urlpatterns = [
     path('search/', EventSearch.as_view(), name='events-search'),  # POST with searchStr
     path('<int:id>/', EventDetail.as_view(), name='event-detail'),  # GET, PUT, DELETE
     path('delete/all/', EventDeleteAll.as_view(), name='event-delete-all'),  # DELETE all
+    path("notify-close-events", NotifyCloseEvent.as_view(), name="notify-close-events")
 ]
