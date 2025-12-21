@@ -5,6 +5,7 @@ from .views import (
     UserInterestsView,
     InterestDetailView,
     UserInterestedEventsView,
+    fetchAssoUserInterest,
 )
 
 urlpatterns = [
@@ -13,4 +14,5 @@ urlpatterns = [
     path("user/<int:user_id>/", UserInterestsView.as_view()),
     path("<int:user_id>/<int:event_id>/", InterestDetailView.as_view()),
     path("user/<int:user_id>/events/", UserInterestedEventsView.as_view()),
+    path("assoUserInterest/<int:asso_Id>/",fetchAssoUserInterest.as_view()),
 ]
