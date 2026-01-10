@@ -128,3 +128,19 @@ class UserInterestedEventsView(APIView):
         return Response(events_resp.data or [])
 
 
+class fetchAssoUserInterest(APIView):
+    def get(self, request, asso_Id: int):
+        resp = (
+            supabase.table("interests")
+            .select("eventId, userId, createdAt, events!inner(id, associationId)")
+            .eq("events.associationId", asso_Id)
+            .execute()
+        )
+        
+        print(f"Association ID: {asso_Id}")
+        print(f"Response data: {resp.data}")  # Debug print
+        
+        if not resp.data:
+            return Response([])
+        
+        return Response(resp.data)
